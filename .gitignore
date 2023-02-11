@@ -1,10 +1,12 @@
 /homeassistant
 /nodered
-/zigbee2mqtt
 /scripts
 /import
 
 *.passwd
 *.log
+log.*
+secret*
 
-mosquitto.db
+*.db
+state.json

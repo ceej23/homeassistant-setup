@@ -1,0 +1,28 @@
+homeassistant: true
+permit_join: true
+mqtt:
+  base_topic: zigbee2mqtt
+  server: '!secret.yaml server'
+  user: '!secret.yaml user'
+  password: '!secret.yaml password'
+serial:
+  port: /dev/ttyACM0
+frontend: true
+advanced:
+  network_key:
+    - 29
+    - 109
+    - 49
+    - 225
+    - 179
+    - 181
+    - 151
+    - 70
+    - 80
+    - 113
+    - 231
+    - 211
+    - 83
+    - 222
+    - 116
+    - 252
