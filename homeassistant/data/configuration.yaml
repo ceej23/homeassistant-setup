@@ -1,0 +1,107 @@
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+zone:
+  - name: Home
+    latitude: !secret home_latitude
+    longitude: !secret home_longitude
+    radius: 100
+    icon: mdi:account-multiple
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+panel_iframe:
+  nodered:
+    title: Node-RED
+    icon: mdi:lan
+    url: !secret nodered_server_address
+    require_admin: true
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+aarlo:
+  username: !secret arlo_username
+  password: !secret arlo_password
+  tfa_source: imap
+  tfa_type: email
+  tfa_host: imap.gmail.com:993
+  tfa_username: !secret gmail_tfa_username
+  tfa_password: !secret gmail_tfa_password
+
+camera:
+  - platform: aarlo
+
+binary_sensor:
+  - platform: aarlo
+    monitored_conditions:
+    - motion
+    - sound
+    - connectivity
+
+sensor:
+  - platform: aarlo
+    monitored_conditions:
+    - total_cameras
+    - last_capture
+    - recent_activity
+    - captured_today
+    - battery_level
+    - signal_strength
+
+  - platform: plex_recently_added
+    name: Recently Added Movies # will create sensor.recently_added_movies
+    token: !secret plex_token
+    host: !secret media_server_ip
+    port: 32400
+    max: 3
+    section_types:
+      - movie
+
+  - platform: plex_recently_added
+    name: Recently Added TV  # will create sensor.recently_added_tv
+    token: !secret plex_token
+    host: !secret media_server_ip
+    port: 32400
+    max: 3
+    section_types:
+      - show
+    
+  - platform: radarr_upcoming_media
+    api_key: !secret radarr_api_key
+    host: !secret media_server_ip
+    port: 7878
+    days: 100
+    ssl: false
+    theaters: false
+    max: 3
+
+  - platform: sonarr_upcoming_media
+    api_key: !secret sonarr_api_key
+    host: 192.168.50.201
+    port: 8989
+    days: 100
+    ssl: false
+    max: 3
+
+light:
+  - platform: aarlo
+
+switch:
+  - platform: aarlo
+    siren: True
+    all_sirens: True
+    snapshot: True
+    siren_volume: 1
+    siren_duration: 10
+
+media_player:
+  - platform: aarlo
+
+homeassistant:
+  packages:
+    tesla: !include ./teslamate.yaml

@@ -1,0 +1,331 @@
+automation:
+  - alias: Update Tesla location as MQTT location updates
+    initial_state: on
+    trigger:
+      - platform: mqtt
+        topic: teslamate/cars/1/latitude
+      - platform: mqtt
+        topic: teslamate/cars/1/longitude
+    action:
+      - service: device_tracker.see
+        data_template:
+          dev_id: tesla_location
+          gps:
+            [
+              "{{ states.sensor.tesla_latitude.state | default(0) }}",
+              "{{ states.sensor.tesla_longitude.state | default(0) }}",
+            ]
+
+  - alias: Open garage if car returns home
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: device_tracker.tesla_location
+        from: "not_home"
+        to: "home"
+          #    action:
+          #      - service: cover.open_cover
+          #        entity_id: cover.garage_door
+
+proximity:
+  home_tesla:
+    zone: home
+    devices:
+      - device_tracker.tesla_location
+    tolerance: 10
+    unit_of_measurement: km
+
+
+template:
+  - sensor:
+      - name: Tesla Parking Brake
+        unique_id: "tesla_parking_brake"
+        state: >
+         {% if is_state('sensor.tesla_shift_state', 'P') %}
+           ON
+         {% else %}
+           OFF
+         {% endif %}
+      - name: Tesla Estimated Range (mi)
+        unique_id: "tesla_estimated_range_mi"
+        unit_of_measurement: mi
+        state: >
+         {{ ((states.sensor.tesla_est_battery_range_km.state | default(0)) | float / 1.609344) | round(2) }}
+      - name: Tesla Rated Range (mi)
+        unique_id: "tesla_rated_range_mi"
+        unit_of_measurement: mi
+        state: >
+         {{ ((states.sensor.tesla_rated_battery_range_km.state | default(0)) | float / 1.609344) | round(2) }}
+      - name: Tesla Ideal Range (mi)
+        unique_id: "tesla_ideal_range_mi"
+        unit_of_measurement: mi
+        state: >
+         {{ ((states.sensor.tesla_ideal_battery_range_km.state | default(0)) | float / 1.609344) | round(2) }}
+      - name: Tesla Odometer (mi)
+        unique_id: "tesla_odometer_mi"
+        unit_of_measurement: mi
+        state: >
+         {{ ((states.sensor.tesla_odometer.state | default(0)) | float / 1.609344) | round(2) }}
+      - name: Tesla Speed (MPH)
+        unique_id: "tesla_speed_mph"
+        unit_of_measurement: mph
+        state: >
+         {{ ((states.sensor.tesla_speed.state | default(0)) | float(0) / 1.609344) | round(2) }}
+      - name: Tesla Elevation (ft)
+        unique_id: "tesla_elevation_ft"
+        unit_of_measurement: ft
+        state: >
+         {{ ((states.sensor.tesla_elevation.state | default(0)) | float(0) * 3.2808 ) | round(2) }}
+
+mqtt:
+  sensor:
+    - name: tesla_display_name
+      state_topic: "teslamate/cars/1/display_name"
+      unique_id: "tesla_cars_1_display_name"
+      icon: mdi:car
+    - name: tesla_state
+      state_topic: "teslamate/cars/1/state"
+      unique_id: "tesla_cars_1_state"
+      icon: mdi:car-connected
+    - name: tesla_since
+      state_topic: "teslamate/cars/1/since"
+      unique_id: "tesla_cars_1_since"
+      device_class: timestamp
+      icon: mdi:clock-outline
+    - name: tesla_version
+      state_topic: "teslamate/cars/1/version"
+      unique_id: "tesla_cars_1_version"
+      icon: mdi:alphabetical
+    - name: tesla_update_version
+      state_topic: "teslamate/cars/1/update_version"
+      unique_id: "tesla_cars_1_update_version"
+      icon: mdi:alphabetical
+    - name: tesla_model
+      state_topic: "teslamate/cars/1/model"
+      unique_id: "tesla_cars_1_model"
+    - name: tesla_trim_badging
+      state_topic: "teslamate/cars/1/trim_badging"
+      unique_id: "tesla_cars_1_trim_badging"
+      icon: mdi:shield-star-outline
+    - name: tesla_exterior_color
+      state_topic: "teslamate/cars/1/exterior_color"
+      unique_id: "tesla_cars_1_exterior_color"
+      icon: mdi:palette
+    - name: tesla_wheel_type
+      state_topic: "teslamate/cars/1/wheel_type"
+      unique_id: "tesla_cars_1_wheel_type"
+    - name: tesla_spoiler_type
+      state_topic: "teslamate/cars/1/spoiler_type"
+      unique_id: "tesla_cars_1_spoiler_type"
+      icon: mdi:car-sports
+    - name: tesla_geofence
+      state_topic: "teslamate/cars/1/geofence"
+      unique_id: "tesla_cars_1_geofence"
+      icon: mdi:earth
+    - name: tesla_latitude
+      state_topic: "teslamate/cars/1/latitude"
+      unique_id: "tesla_cars_1_latitude"
+      unit_of_measurement: °
+      icon: mdi:crosshairs-gps
+    - name: tesla_longitude
+      state_topic: "teslamate/cars/1/longitude"
+      unique_id: "tesla_cars_1_longitude"
+      unit_of_measurement: °
+      icon: mdi:crosshairs-gps
+    - name: tesla_shift_state
+      state_topic: "teslamate/cars/1/shift_state"
+      unique_id: "tesla_cars_1_shift_state"
+      icon: mdi:car-shift-pattern
+    - name: tesla_power
+      state_topic: "teslamate/cars/1/power"
+      unique_id: "tesla_cars_1_power"
+      device_class: power
+      unit_of_measurement: W
+      icon: mdi:flash
+    - name: tesla_speed
+      state_topic: "teslamate/cars/1/speed"
+      unique_id: "tesla_cars_1_speed"
+      unit_of_measurement: "km/h"
+      icon: mdi:speedometer
+    - name: tesla_heading
+      state_topic: "teslamate/cars/1/heading"
+      unique_id: "tesla_cars_1_heading"
+      unit_of_measurement: °
+      icon: mdi:compass
+    - name: tesla_elevation
+      state_topic: "teslamate/cars/1/elevation"
+      unique_id: "tesla_cars_1_elevation"
+      unit_of_measurement: m
+      icon: mdi:image-filter-hdr
+    - name: tesla_inside_temp
+      state_topic: "teslamate/cars/1/inside_temp"
+      unique_id: "tesla_cars_1_inside_temp"
+      device_class: temperature
+      unit_of_measurement: °C
+      icon: mdi:thermometer-lines
+    - name: tesla_outside_temp
+      state_topic: "teslamate/cars/1/outside_temp"
+      unique_id: "tesla_cars_1_outside_temp"
+      device_class: temperature
+      unit_of_measurement: °C
+      icon: mdi:thermometer-lines
+    - name: tesla_odometer
+      state_topic: "teslamate/cars/1/odometer"
+      unique_id: "tesla_cars_1_odometer"
+      unit_of_measurement: km
+      icon: mdi:counter
+    - name: tesla_est_battery_range_km
+      state_topic: "teslamate/cars/1/est_battery_range_km"
+      unique_id: "tesla_cars_1_est_battery_range_km"
+      unit_of_measurement: km
+      icon: mdi:gauge
+    - name: tesla_rated_battery_range_km
+      state_topic: "teslamate/cars/1/rated_battery_range_km"
+      unique_id: "tesla_cars_1_rated_battery_range_km"
+      unit_of_measurement: km
+      icon: mdi:gauge
+    - name: tesla_ideal_battery_range_km
+      state_topic: "teslamate/cars/1/ideal_battery_range_km"
+      unique_id: "tesla_cars_1_ideal_battery_range_km"
+      unit_of_measurement: km
+      icon: mdi:gauge
+    - name: tesla_battery_level
+      state_topic: "teslamate/cars/1/battery_level"
+      unique_id: "tesla_cars_1_battery_level"
+      device_class: battery
+      unit_of_measurement: "%"
+      icon: mdi:battery-80
+    - name: tesla_usable_battery_level
+      state_topic: "teslamate/cars/1/usable_battery_level"
+      unique_id: "tesla_cars_1_usable_battery_level"
+      unit_of_measurement: "%"
+      icon: mdi:battery-80
+    - name: tesla_charge_energy_added
+      state_topic: "teslamate/cars/1/charge_energy_added"
+      unique_id: "tesla_cars_1_charge_energy_added"
+      device_class: energy
+      unit_of_measurement: kWh
+      icon: mdi:battery-charging
+    - name: tesla_charge_limit_soc
+      state_topic: "teslamate/cars/1/charge_limit_soc"
+      unique_id: "tesla_cars_1_charge_limit_soc"
+      unit_of_measurement: "%"
+      icon: mdi:battery-charging-100
+    - name: tesla_charger_actual_current
+      state_topic: "teslamate/cars/1/charger_actual_current"
+      unique_id: "tesla_cars_1_charger_actual_current"
+      device_class: current
+      unit_of_measurement: A
+      icon: mdi:lightning-bolt
+    - name: tesla_charger_phases
+      state_topic: "teslamate/cars/1/charger_phases"
+      unique_id: "tesla_cars_1_charger_phases"
+      icon: mdi:sine-wave
+    - name: tesla_charger_power
+      state_topic: "teslamate/cars/1/charger_power"
+      unique_id: "tesla_cars_1_charger_power"
+      device_class: power
+      unit_of_measurement: kW
+      icon: mdi:lightning-bolt
+    - name: tesla_charger_voltage
+      state_topic: "teslamate/cars/1/charger_voltage"
+      unique_id: "tesla_cars_1_charger_voltage"
+      device_class: voltage
+      unit_of_measurement: V
+      icon: mdi:lightning-bolt
+    - name: tesla_scheduled_charging_start_time
+      state_topic: "teslamate/cars/1/scheduled_charging_start_time"
+      unique_id: "tesla_cars_1_scheduled_charging_start_time"
+      device_class: timestamp
+      icon: mdi:clock-outline
+    - name: tesla_time_to_full_charge
+      state_topic: "teslamate/cars/1/time_to_full_charge"
+      unique_id: "tesla_cars_1_time_to_full_charge"
+      unit_of_measurement: h
+      icon: mdi:clock-outline
+  binary_sensor:
+     - name: tesla_healthy
+       state_topic: "teslamate/cars/1/healthy"
+       unique_id: "tesla_cars_1_healthy"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:heart-pulse
+     - name: tesla_update_available
+       state_topic: "teslamate/cars/1/update_available"
+       unique_id: "tesla_cars_1_update_available"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:alarm
+     - name: tesla_locked
+       device_class: lock
+       state_topic: "teslamate/cars/1/locked"
+       unique_id: "tesla_cars_1_locked"
+       payload_on: "false"
+       payload_off: "true"
+     - name: tesla_sentry_mode
+       state_topic: "teslamate/cars/1/sentry_mode"
+       unique_id: "tesla_cars_1_sentry_mode"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:cctv
+     - name: tesla_windows_open
+       device_class: window
+       state_topic: "teslamate/cars/1/windows_open"
+       unique_id: "tesla_cars_1_windows_open"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:car-door
+     - name: tesla_doors_open
+       device_class: door
+       state_topic: "teslamate/cars/1/doors_open"
+       unique_id: "tesla_cars_1_doors_open"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:car-door
+     - name: tesla_trunk_open
+       device_class: opening
+       state_topic: "teslamate/cars/1/trunk_open"
+       unique_id: "tesla_cars_1_trunk_open"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:car-side
+     - name: tesla_frunk_open
+       device_class: opening
+       state_topic: "teslamate/cars/1/frunk_open"
+       unique_id: "tesla_cars_1_frunk_open"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:car-side
+     - name: tesla_is_user_present
+       device_class: presence
+       state_topic: "teslamate/cars/1/is_user_present"
+       unique_id: "tesla_cars_1_is_user_present"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:human-greeting
+     - name: tesla_is_climate_on
+       state_topic: "teslamate/cars/1/is_climate_on"
+       unique_id: "tesla_cars_1_is_climate_on"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:fan
+     - name: tesla_is_preconditioning
+       state_topic: "teslamate/cars/1/is_preconditioning"
+       unique_id: "tesla_cars_1_is_preconditioning"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:fan
+     - name: tesla_plugged_in
+       device_class: plug
+       state_topic: "teslamate/cars/1/plugged_in"
+       unique_id: "tesla_cars_1_plugged_in"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:ev-station
+     - name: tesla_charge_port_door_open
+       device_class: opening
+       state_topic: "teslamate/cars/1/charge_port_door_open"
+       unique_id: "tesla_cars_1_charge_port_door_open"
+       payload_on: "true"
+       payload_off: "false"
+       icon: mdi:ev-plug-tesla
