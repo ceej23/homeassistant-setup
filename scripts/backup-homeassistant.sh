@@ -13,7 +13,5 @@ delete_after_days=30
 # Sync the local backups with the remote
 rclone sync $local_backup_dir $remote:$remote_backup_dir
 
-echo "rclone sync $local_backup_dir $remote:$remote_backup_dir"
-
 # Delete backups older than $delete_after_days days
 rclone delete $remote:$remote_backup_dir --min-age $delete_after_days
