@@ -67,9 +67,9 @@ services:
     image: postgres:14
     restart: always
     environment:
-      - POSTGRES_USER=teslamate
-      - POSTGRES_PASSWORD=vtGv6p&fa8EXcR^wqecAYlne
-      - POSTGRES_DB=teslamate
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - teslamate-db:/var/lib/postgresql/data
 
@@ -80,10 +80,10 @@ services:
       - 3000:3000
     restart: always
     environment:
-      - DATABASE_USER=teslamate
-      - DATABASE_PASS=vtGv6p&fa8EXcR^wqecAYlne
-      - DATABASE_NAME=teslamate
-      - DATABASE_HOST=database
+      - DATABASE_USER=${POSTGRES_USER}
+      - DATABASE_PASS=${POSTGRES_PASSWORD}
+      - DATABASE_NAME=${POSTGRES_DB}
+      - DATABASE_HOST=postgres
     volumes:
       - teslamate-grafana-data:/var/lib/grafana
 
@@ -99,15 +99,15 @@ services:
     cap_drop:
       - all
     environment:
-      - ENCRYPTION_KEY=aaE3!m#DEbS&A8cDWKHK4*v@
-      - DATABASE_USER=teslamate
-      - DATABASE_PASS=vtGv6p&fa8EXcR^wqecAYlne
-      - DATABASE_NAME=teslamate
-      - DATABASE_HOST=database
-      - MQTT_HOST=192.168.50.104
-      - MQTT_PORT=1883
-      - MQTT_USERNAME=hass
-      - MQTT_PASSWORD=Granular747
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - DATABASE_USER=${POSTGRES_USER}
+      - DATABASE_PASS=${POSTGRES_PASSWORD}
+      - DATABASE_NAME=${POSTGRES_DB}
+      - DATABASE_HOST=postgres
+      - MQTT_HOST=192.168.50.171
+      - MQTT_PORT=${MQTT_PORT}
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
     volumes:
       - ./import:/opt/app/import
 

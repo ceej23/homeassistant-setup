@@ -26,3 +26,12 @@ advanced:
     - 222
     - 116
     - 252
+devices:
+  '0x04cd15fffe377271':
+    friendly_name: Blind 1
+  '0x94deb8fffeacd74e':
+    friendly_name: Blind 2
+  '0x94deb8fffeb0e145':
+    friendly_name: Blind 4
+  '0x04cd15fffe3d0ad2':
+    friendly_name: Blind 3
