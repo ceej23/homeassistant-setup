@@ -1,7 +1,10 @@
-/homeassistant
 /nodered
-/scripts
 /import
+
+# scripts exclusions
+/scripts/lib
+/scripts/logs
+/scripts/setup.sh
 
 *.passwd
 *.log
@@ -10,3 +13,16 @@ secret*
 
 *.db
 state.json
+
+# home assistant exclusions
+homeassistant/data/backups
+homeassistant/data/blueprints
+homeassistant/data/.[^/]*
+homeassistant/data/custom_components
+homeassistant/data/deps
+homeassistant/data/image
+homeassistant/data/tts
+homeassistant/data/www
+
+home-assistant*
+.HA_VERSION
