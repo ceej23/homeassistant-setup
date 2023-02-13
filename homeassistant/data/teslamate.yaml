@@ -1,31 +1,32 @@
-automation:
-  - alias: Update Tesla location as MQTT location updates
-    initial_state: on
-    trigger:
-      - platform: mqtt
-        topic: teslamate/cars/1/latitude
-      - platform: mqtt
-        topic: teslamate/cars/1/longitude
-    action:
-      - service: device_tracker.see
-        data_template:
-          dev_id: tesla_location
-          gps:
-            [
-              "{{ states.sensor.tesla_latitude.state | default(0) }}",
-              "{{ states.sensor.tesla_longitude.state | default(0) }}",
-            ]
+#automation:
 
-  - alias: Open garage if car returns home
-    initial_state: on
-    trigger:
-      - platform: state
-        entity_id: device_tracker.tesla_location
-        from: "not_home"
-        to: "home"
-          #    action:
-          #      - service: cover.open_cover
-          #        entity_id: cover.garage_door
+#  - alias: Update Tesla location as MQTT location updates
+#    initial_state: on
+#    trigger:
+#      - platform: mqtt
+#        topic: teslamate/cars/1/latitude
+#      - platform: mqtt
+#        topic: teslamate/cars/1/longitude
+#    action:
+#      - service: device_tracker.see
+#        data_template:
+#          dev_id: tesla_location
+#          gps:
+#            [
+#              "{{ states.sensor.tesla_latitude.state | default(0) }}",
+#              "{{ states.sensor.tesla_longitude.state | default(0) }}",
+#            ]
+
+#  - alias: Open garage if car returns home
+#    initial_state: on
+#    trigger:
+#      - platform: state
+#        entity_id: device_tracker.tesla_location
+#        from: "not_home"
+#        to: "home"
+#    action:
+#      - service: cover.open_cover
+#        entity_id: cover.garage_door
 
 proximity:
   home_tesla:

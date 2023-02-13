@@ -10,3 +10,37 @@
   - service: backup.create
     data: {}
   mode: single
+
+- id: '1676208034742'
+  alias: Open garage if car returns home
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: device_tracker.tesla_location
+    from: not_home
+    to: home
+  condition: []
+  action:
+  - service: cover.open_cover
+    entity_id: cover.garage_door
+  mode: single
+  initial_state: true
+
+- id: '1676208376332'
+  alias: Update Tesla location as MQTT location updates
+  description: ''
+  trigger:
+  - platform: mqtt
+    topic: teslamate/cars/1/latitude
+  - platform: mqtt
+    topic: teslamate/cars/1/longitude
+  condition: []
+  action:
+  - service: device_tracker.see
+    data_template:
+      dev_id: tesla_location
+      gps:
+      - '{{ states.sensor.tesla_latitude.state | default(0) }}'
+      - '{{ states.sensor.tesla_longitude.state | default(0) }}'
+  mode: single
+  initial_state: true
